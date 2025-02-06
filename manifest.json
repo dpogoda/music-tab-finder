@@ -2,14 +2,11 @@
   "manifest_version": 3,
   "name": "Music Tab Finder",
   "version": "1.0",
-  "description": "Quickly switch to the tab playing audio with a shortcut or right-click.",
+  "description": "Quickly switch to the tab playing audio with a right-click.",
   "permissions": [
     "tabs",
     "contextMenus",
     "commands"
-  ],
-  "host_permissions": [
-    "*://*/*"
   ],
   "background": {
     "service_worker": "background.js"
