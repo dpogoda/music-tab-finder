@@ -1,4 +1,5 @@
 let lastAudibleTabId = null;
+let previousTabId = null;
 
 // Function to check which tab is playing audio
 function checkForAudioTabs() {
@@ -8,7 +9,6 @@ function checkForAudioTabs() {
       console.log("🎵 Music is playing in tab:", lastAudibleTabId);
     } else {
       lastAudibleTabId = null;
-      console.log("🚫 No tab playing audio.");
     }
   });
 }
@@ -16,27 +16,36 @@ function checkForAudioTabs() {
 // Run this check every second
 setInterval(checkForAudioTabs, 1000);
 
-// Create a context menu when the extension loads
+// Create two separate context menu items on installation
 chrome.runtime.onInstalled.addListener(() => {
   chrome.contextMenus.create({
     id: "switch_to_music_tab",
     title: "🔊 Switch to Music Tab",
     contexts: ["all"]
   });
+
+  chrome.contextMenus.create({
+    id: "jump_back_to_previous_tab",
+    title: "⬅ Jump Back to Previous Tab",
+    contexts: ["all"]
+  });
 });
 
-// Listen for right-click menu clicks
+// Handle right-click menu actions
 chrome.contextMenus.onClicked.addListener((info, tab) => {
-  if (info.menuItemId === "switch_to_music_tab") {
-    if (lastAudibleTabId) {
-      console.log("🔄 Switching to music tab:", lastAudibleTabId);
-      chrome.tabs.update(lastAudibleTabId, { active: true }, () => {
-        if (chrome.runtime.lastError) {
-          console.error("❌ Error switching tab:", chrome.runtime.lastError.message);
-        }
-      });
-    } else {
-      console.log("⚠️ No active audio tab found.");
+  chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
+    if (tabs.length > 0) {
+      const activeTabId = tabs[0].id;
+
+      if (info.menuItemId === "switch_to_music_tab" && lastAudibleTabId) {
+        previousTabId = activeTabId; // Store the previous tab
+        chrome.tabs.update(lastAudibleTabId, { active: true });
+        console.log("🔄 Switched to music tab:", lastAudibleTabId);
+      } 
+      else if (info.menuItemId === "jump_back_to_previous_tab" && previousTabId) {
+        chrome.tabs.update(previousTabId, { active: true });
+        console.log("⬅ Jumped back to previous tab:", previousTabId);
+      }
     }
-  }
+  });
 });
