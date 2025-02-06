@@ -1,0 +1,20 @@
+{
+  "manifest_version": 3,
+  "name": "Music Tab Finder",
+  "version": "1.0",
+  "description": "Finds and highlights the tab where music is playing.",
+  "permissions": [
+    "tabs",
+    "contextMenus"
+  ],
+  "host_permissions": [
+    "*://*/*"
+  ],
+  "background": {
+    "service_worker": "background.js"
+  },
+  "action": {
+    "default_popup": "popup.html",
+    "default_title": "Find Music Tab"
+  }
+}
